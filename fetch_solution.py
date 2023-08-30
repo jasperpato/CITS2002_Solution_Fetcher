@@ -29,6 +29,7 @@ def fetch_cookies(url, data):
 
 def print_measurements(text, verbose=False):
 	output = ''
+	error = ''
 	for line in text.split('\n'):
 		if 'h3' in line and 'measurements' in line:
 			output += f"solution: {line.split('&nbsp;')[1]}\n"
@@ -37,7 +38,10 @@ def print_measurements(text, verbose=False):
 			for x in re.split('<|>', line):
 				if '@' in x:
 					output += f'x\n'
-	print(output or "No output\n", end='')
+		elif 'error' in line:
+			error += f'{line}\n'
+
+	print(output or error, end='')
 
 if __name__ == '__main__':
 
