@@ -3,10 +3,13 @@ import dotenv
 import pickle
 import re
 import argparse
+import pathlib
+
+dir = pathlib.Path(__file__).parent
 
 def get_cookies(url, data):
 	try:
-		with open('cookies', 'rb') as f:
+		with open(dir / 'cookies', 'rb') as f:
 			cookies = pickle.load(f)
 			return cookies or fetch_cookies(url, data)
 	except: return fetch_cookies(url, data)
@@ -20,18 +23,21 @@ def fetch_cookies(url, data):
 		exit()
 
 	cookies = res.cookies
-	with open('cookies', 'wb') as f:
+	with open(dir / 'cookies', 'wb') as f:
 		pickle.dump(cookies, f)
 	return cookies
 
 def print_measurements(text, verbose=False):
+	output = ''
 	for line in text.split('\n'):
 		if 'h3' in line and 'measurements' in line:
-			print('solution:', line.split('&nbsp;')[1])
+			output += f"solution: {line.split('&nbsp;')[1]}\n"
 
 		elif verbose and '@' in line and 'script' not in line:
 			for x in re.split('<|>', line):
-				if '@' in x: print(x)
+				if '@' in x:
+					output += f'x\n'
+	print(output or "No output\n", end='')
 
 if __name__ == '__main__':
 
@@ -50,7 +56,7 @@ if __name__ == '__main__':
 		exit()
 
 	# credentials
-	env = dotenv.dotenv_values()
+	env = dotenv.dotenv_values(dir / '.env')
 	
 	url = env['url']
 
